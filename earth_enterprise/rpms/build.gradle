@@ -217,6 +217,7 @@ task openGeeServerRpm (type: Rpm) {
         ospackage.  Detailed here: https://github.com/nebula-plugins/gradle-ospackage-plugin/issues/212
         */
         addParentDirs=false
+        preInstall = new File( packageName, 'pre-install.sh')
 
         exclude {
             !new File(
