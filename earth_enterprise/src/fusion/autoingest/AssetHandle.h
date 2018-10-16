@@ -46,7 +46,7 @@ class AssetHandle_  {
   typedef khRefGuard<Impl> HandleType;
   struct undefined_type; // never defined.  Just used for bool operations
 
- protected:
+ public:
   static inline khCache<std::string, HandleType>& cache(void);
 
  public:
@@ -127,7 +127,7 @@ class AssetHandle_  {
     return handle.operator->();
   }
   // needed so AssetHandle_ can be put in a set
-  bool operator<(const AssetHandle_ &o) const {
+  bool operator<(const AssetHandle_ &oq) const {
     return ref < o.ref;
   }
 

@@ -183,13 +183,16 @@ class khCache {
   void clear(void) {
     CheckListInvariant();
     // Delete all the items.
+    int dels = 0;
     for (typename MapType::iterator i = map.begin(); i != map.end(); ++i) {
       assert(i->second);
       delete i->second;
       i->second = 0;
+      ++dels;
     }
     map.clear();
     head = tail = 0;
+    notify(NFY_NOTICE, "Deleted %d items from the cache", dels);
   }
   void Add(const Key &key, const Value &val, bool prune = true) {
     CheckListInvariant();

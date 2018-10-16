@@ -26,7 +26,8 @@
 #include <autoingest/geAssetRoot.h>
 #include "common/performancelogger.h"
 #include "fusion/config/gefConfigUtil.h"
-
+#include "Asset.h"
+#include "AssetVersion.h"
 
 
 // ****************************************************************************
@@ -73,6 +74,56 @@ khSystemManager::SetWantExit(void)
   }
 }
 
+#include "stdlib.h"
+#include "stdio.h"
+#include "string.h"
+
+int parseLine(char* line){
+    // This assumes that a digit will be found and the line ends in " Kb".
+    int i = strlen(line);
+    const char* p = line;
+    while (*p <'0' || *p > '9') p++;
+    line[i-3] = '\0';
+    i = atoi(p);
+    return i;
+}
+
+int getVirtualMem(){ //Note: this value is in KB!
+    FILE* file = fopen("/proc/self/status", "r");
+    int result = -1;
+    char line[128];
+
+    while (fgets(line, 128, file) != NULL){
+        if (strncmp(line, "VmSize:", 7) == 0){
+            result = parseLine(line);
+            break;
+        }
+    }
+    fclose(file);
+    return result;
+}
+
+int getPhysicalMem(){ //Note: this value is in KB!
+    FILE* file = fopen("/proc/self/status", "r");
+    int result = -1;
+    char line[128];
+
+    while (fgets(line, 128, file) != NULL){
+        if (strncmp(line, "VmRSS:", 6) == 0){
+            result = parseLine(line);
+            break;
+        }
+    }
+    fclose(file);
+    return result;
+}
+
+void print_mem_usage() {
+  int virtMem = getVirtualMem();
+  int physMem = getPhysicalMem();
+  notify(NFY_NOTICE, "Virtual Memory: %d KB, Physical Memory: %d KB", virtMem, physMem);
+}
+
 // when SIGHUP is given, reload systemrc
 void systemrc_reload(int signum)
 {
@@ -83,6 +134,14 @@ void systemrc_reload(int signum)
     notify(NFY_WARN, "system log level changed to: %s",
            khNotifyLevelToString(static_cast<khNotifyLevel>(logLevel)).c_str());
     setNotifyLevel(static_cast<khNotifyLevel>(logLevel));
+
+    // Temporarily clear the caches
+    print_mem_usage();
+    Asset::cache().clear();
+    sleep(60);
+    print_mem_usage();
+    AssetVersion::cache().clear();
+    print_mem_usage();
 }
 
 void handleExitSignals(int signum)
