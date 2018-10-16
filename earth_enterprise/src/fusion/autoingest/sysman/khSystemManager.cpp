@@ -173,6 +173,8 @@ khSystemManager::SignalLoop(void)
 void
 khSystemManager::Run(void)
 {
+  print_mem_usage();
+
   // block the signals I'm going to wait for before any threads get started
   sigset_t waitset;
   sigemptyset(&waitset);
@@ -322,4 +324,5 @@ khSystemManager::Run(void)
 
   // now just drop off the end (returning to main - which will also
   // drop off the end)
+  print_mem_usage();
 }

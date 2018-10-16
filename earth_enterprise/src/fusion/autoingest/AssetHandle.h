@@ -127,7 +127,7 @@ class AssetHandle_  {
     return handle.operator->();
   }
   // needed so AssetHandle_ can be put in a set
-  bool operator<(const AssetHandle_ &oq) const {
+  bool operator<(const AssetHandle_ &o) const {
     return ref < o.ref;
   }
 
