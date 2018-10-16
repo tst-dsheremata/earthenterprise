@@ -185,6 +185,7 @@ class khCache {
     // Delete all the items.
     int dels = 0;
     for (typename MapType::iterator i = map.begin(); i != map.end(); ++i) {
+      notify(NFY_NOTICE, "Ref count: %d", i->second->val.refcount());
       assert(i->second);
       delete i->second;
       i->second = 0;

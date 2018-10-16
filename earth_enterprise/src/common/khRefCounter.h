@@ -18,6 +18,7 @@
 #define GEO_EARTH_ENTERPRISE_SRC_COMMON_KHREFCOUNTER_H_
 
 #include <assert.h>
+#include <stdio.h>
 
 #include "common/khTypes.h"
 #include "common/khGuard.h"
@@ -245,8 +246,11 @@ class khRefCounterImpl : public ThreadPolicy::MutexHolder {
     // nobody else can be trying to ref/unref. Unless of course another
     // thread is accesing this object through the same guard at the same
     // time, but that's bad news anyway.
-    if (deleteme)
+    if (deleteme) {
+      printf("Deleting item in khRefCounter\n");
+      fflush(stdout);
       delete this;
+    }
   }
 
  public:
