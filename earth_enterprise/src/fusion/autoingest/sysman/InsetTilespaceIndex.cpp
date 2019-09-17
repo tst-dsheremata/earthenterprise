@@ -135,6 +135,11 @@ InsetTilespaceIndex::intersectingExtentsQuadtreePaths(QuadtreePath quadtreeMbr, 
                 quadtreeMbr.AsString().c_str(), otherMbr.AsString().c_str() );
             if (otherMbr.Level() >= minLevel && otherMbr.Level() <= maxLevel) {
                 if (QuadtreePath::OverlapsAtLevel(quadtreeMbr, otherMbr, level)) {
+
+                    // TODO - there is probably an issue here with duplicate 
+                    // "otherMbr"'s being added to the index - this needs
+                    // to be be fixed in order to have the same results as 
+                    // the original algo. 
                     intersectingQuadtrees.emplace_back(otherMbr);
                     notify(NFY_DEBUG, "\tOVERLAP at level %d", level );
                     break;
