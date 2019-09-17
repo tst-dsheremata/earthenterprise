@@ -100,14 +100,17 @@ public:
     //                 uint endCoverageLevel);
 
     std::vector <khExtents<double>>
-    findInsetsControlAlgo(const khInsetCoverage &coverage,
+    findInsetsControlAlgo(const khInsetCoverage &queryCoverageArea,
                           const std::vector <khExtents<double>> &inputExtents) {
-        uint beginMinifyLevel = 1;
-        uint endMinifyLevel = 19;
+        uint beginLevel = queryCoverageArea.beginLevel();
+        uint endLevel = queryCoverageArea.endLevel();;
+        khExtents<uint32>> queryExtents = queryCoverageArea.levelExtents(beginLevel);
         std::vector <uint32> neededIndexes; //This is our return value...
         std::vector <khExtents<double>> matchingExtents;
-        std::vector <khExtents<uint32>> tileExtentsVec;
-
+        std::vector <khExtents<uint32>> inputTileExtentsVec;
+        
+        notify(NFY_WARN, "Querying for extents that intersect with query Coverage Area:  \n\t%d, %d, %d, %d ... ",
+                queryExtents.beginX(), queryExtents.endX(), queryExtents.beginY(), queryExtents.endY(),
 
         for (auto degExtents : inputExtents) {
             khExtents <uint32> tileExtents = DegExtentsToTileExtents(degExtents, 21);
@@ -116,13 +119,12 @@ public:
                     degExtents.beginX(), degExtents.endX(), degExtents.beginY(), degExtents.endY(),
                     tileExtents.beginX(), tileExtents.endX(), tileExtents.beginY(), tileExtents.endY());
         }
-        uint vecsize = (uint) tileExtentsVec.size();
-        FindNeededImageryInsets(coverage,
-                                tileExtentsVec,
-                                vecsize,
+        FindNeededImageryInsets(queryCoverageArea,
+                                inputTileExtentsVec,
+                                inputTileExtentsVec.size(),
                                 neededIndexes,
-                                beginMinifyLevel,
-                                endMinifyLevel);
+                                beginLevel,
+                                endLevel);
         notify(NFY_WARN, "%lu", neededIndexes.size());
         for (uint index : neededIndexes) {
             khExtents<double> ex = inputExtents[index];
@@ -132,7 +134,7 @@ public:
     }
 
     std::vector <khExtents<double>>
-    findInsetsExperimentalAlgo(const khInsetCoverage &queryCoverage,
+    findInsetsExperimentalAlgo(const khInsetCoverage &queryCoverageArea,
                                const std::vector <khExtents<double>> &inputExtents) {
         std::vector <khExtents<double>> matchingExtentsVec;
         InsetTilespaceIndex qtIndex;
@@ -140,13 +142,13 @@ public:
         for (auto extents : inputExtents) {
             qtIndex.add(extents);
         }
-        int level = queryCoverage.beginLevel();
-        auto queryMBR = qtIndex.getQuadtreeMBR(queryCoverage.degreeExtents(), level, queryCoverage.endLevel());
+        int level = queryCoverageArea.beginLevel();
+        auto queryMBR = qtIndex.getQuadtreeMBR(queryCoverageArea.degreeExtents(), level, queryCoverageArea.endLevel());
 
         matchingExtentsVec = qtIndex.intersectingExtents(
                 queryMBR,
-                queryCoverage.beginLevel(),
-                queryCoverage.endLevel());
+                queryCoverageArea.beginLevel(),
+                queryCoverageArea.endLevel());
         notify(NFY_WARN, "Got Here");
 
         return matchingExtentsVec;
@@ -155,24 +157,18 @@ public:
 
     const bool compareAlgorithmOutputs() {
         TestData dataset("./src/fusion/testdata/TestDataQTPs.txt");
-        std::vector<khExtents<double>> testExtents;
-        /*
-        std::vector <QuadtreePath> mbrHashVec;
-        boost::copy(dataset.getData() | boost::adaptors::map_keys,
-                    std::back_inserter(testExtents));
-        */
-        khExtents<double> insetExtents(XYOrder, 114.032, 114.167, 19.1851, 19.3137);
-        khInsetCoverage coverage(RasterProductTilespace(false), insetExtents, 19, 7, 21);
-        std::vector<khExtents<double>> test;
-        test = dataset.getData();
+        //std::vector<khExtents<double>> testExtents;
+        khExtents<double> queryExtentsArea(XYOrder, 114.032, 114.167, 19.1851, 19.3137);
+        khInsetCoverage queryCoverageArea(RasterProductTilespaceFlat, queryExtentsArea, 19, 9, 21);
+        std::vector<khExtents<double>> extentsTestDataVec = dataset.getData();
         
         // khExtents<double> testExtents(XYOrder, -123.531, -120.713, 36.4544, 38.4647);
         // khExtents<double> testExtents2(XYOrder, 114.032, 114.167, 19.1851, 19.3137);
         // test.push_back(testExtents);
         // test.push_back(testExtents2);
-        std::vector<khExtents<double> > requiredExtentsProd = findInsetsControlAlgo(coverage, test);
+        std::vector<khExtents<double> > requiredExtentsProd = findInsetsControlAlgo(queryCoverageArea, extentsTestDataVec);
         notify(NFY_WARN, "Old Algo Done, %lu insets overlap" , requiredExtentsProd.size());
-        std::vector<khExtents<double> > requiredExtentsExp = findInsetsExperimentalAlgo(coverage, test);
+        std::vector<khExtents<double> > requiredExtentsExp = findInsetsExperimentalAlgo(queryCoverageArea, extentsTestDataVec);
         notify(NFY_WARN, "New Algo Done, %lu insets overlap", requiredExtentsExp.size());
         //std::sort(requiredExtentsProd.begin(), requiredExtentsExp.end()); 
         bool listsMatch = (requiredExtentsProd == requiredExtentsExp);
