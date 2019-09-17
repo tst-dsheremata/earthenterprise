@@ -146,8 +146,8 @@ public:
     }
 
 
-    const bool compareAlgorithmOutputs() {
-        TestData dataset("./src/fusion/testdata/TinyTestDataQTPs.txt");
+    const bool compareAlgorithmOutput(std::string fname) {
+        TestData dataset(fname);
         //std::vector<khExtents<double>> testExtents;
         khExtents<double> queryExtentsArea(XYOrder, 114.032, 114.167, 19.1851, 19.3137);
         khInsetCoverage queryCoverageArea(RasterProductTilespaceFlat, queryExtentsArea, 19, 9, 21);
@@ -160,49 +160,44 @@ public:
         bool listsMatch = (requiredExtentsProd == requiredExtentsExp);
         return listsMatch;
     }
-
     InsetTilespaceIndexTest() : insetTilespaceIndex() {};
 };
 
 //This test should result in the getExtentMBR method breaking after level 0.
 
-TEST_F(InsetTilespaceIndexTest, BreakBeforeMaxLevelReached
-) {
-khExtents<double> extent = khExtents<double>(XYOrder, 180, 180, 90, 180);
-int level;
-insetTilespaceIndex.
-getQuadtreeMBR(extent, level, MAX_LEVEL
-);
-EXPECT_EQ(1, level);
+TEST_F(InsetTilespaceIndexTest, BreakBeforeMaxLevelReached) {
+    khExtents<double> extent = khExtents<double>(XYOrder, 180, 180, 90, 180);
+    int level;
+    insetTilespaceIndex.getQuadtreeMBR(extent, level, MAX_LEVEL);
+    EXPECT_EQ(1, level);
 }
 
 //This test should result in the getExtentMBR method looping until the max_level is reached.
-TEST_F(InsetTilespaceIndexTest, DecendToMaxLevel
-) {
-khExtents<double> extent = khExtents<double>(XYOrder, 90, 90, 90, 90);
-int level;
-insetTilespaceIndex.
-getQuadtreeMBR(extent, level, MAX_LEVEL
-);
-EXPECT_EQ(MAX_LEVEL, level
-);
+TEST_F(InsetTilespaceIndexTest, DecendToMaxLevel) {
+    khExtents<double> extent = khExtents<double>(XYOrder, 90, 90, 90, 90);
+    int level;
+    insetTilespaceIndex.getQuadtreeMBR(extent, level, MAX_LEVEL);
+    EXPECT_EQ(MAX_LEVEL, level);
 }
 
-TEST_F(InsetTilespaceIndexTest, compareAlgorithmOutputs) {
-    EXPECT_EQ(compareAlgorithmOutputs(), true);
+TEST_F(InsetTilespaceIndexTest, compareAlgorithmOutputTinyDataset) {
+    EXPECT_EQ(compareAlgorithmOutputs("./src/fusion/testdata/TinyTestDataQTPs.txt", true);
+}
+
+TEST_F(InsetTilespaceIndexTest, compareAlgorithmOutputSmallDataset) {
+    EXPECT_EQ(compareAlgorithmOutputs("./src/fusion/testdata/SmallTestDataQTPs.txt", true);
+}
+
+TEST_F(InsetTilespaceIndexTest, compareAlgorithmOutputLargeDataset) {
+    EXPECT_EQ(compareAlgorithmOutputs("./src/fusion/testdata/LargeTestDataQTPs.txt", true);
 }
 
 //This test should result in the quadtree path 202 being returned.
-TEST_F(InsetTilespaceIndexTest, ReturnSpecificQTP
-) {
-khExtents<double> extent = khExtents<double>(XYOrder, 90, 90, 90, 90);
-int level;
-QuadtreePath qtp = insetTilespaceIndex.getQuadtreeMBR(extent, level, 3);
-EXPECT_EQ("202", qtp.
-
-AsString()
-
-);
+TEST_F(InsetTilespaceIndexTest, ReturnSpecificQTP) {
+    khExtents<double> extent = khExtents<double>(XYOrder, 90, 90, 90, 90);
+    int level;
+    QuadtreePath qtp = insetTilespaceIndex.getQuadtreeMBR(extent, level, 3);
+    EXPECT_EQ("202", qtp.AsString());
 }
 
 int main(int argc, char *argv[]) {
