@@ -25,13 +25,6 @@
 #include "autoingest/plugins/MercatorRasterProductAsset.h"
 #include <UnitTest.h>
 #include <gtest/gtest.h>
-#include <boost/range/sub_range.hpp>
-#include <boost/range/as_literal.hpp>
-#include <boost/range/algorithm.hpp>
-#include <boost/range.hpp>
-#include <boost/range/adaptor/map.hpp>
-#include <boost/range/irange.hpp>
-#include <boost/range/any_range.hpp>
 #include <unordered_map>
 #include <vector>
 #include <iostream>
@@ -63,7 +56,7 @@ public:
                 std::istringstream in(line);
                 double x1, x2, y1, y2;
                 in >> x1 >> x2 >> y1 >> y2;
-                notify(NFY_WARN, "Test Data: %f\t%f\t%f\t%f", x1,x2,y1,y2);
+                notify(NFY_DEBUG, "Test Data: %f\t%f\t%f\t%f", x1,x2,y1,y2);
                 khExtents<double> extents(XYOrder, x1, x2, y1, y2);
                 std::getline(input, line);
                 // Note -  discarding the MBR for now, we'll recalculate it.
@@ -71,7 +64,7 @@ public:
                 in >> qtp_txt >> qtp_level;
                 // QuadtreePath qtpMbr(qtp_txt);
                 extentsVec.push_back(extents);
-                notify(NFY_WARN, "Added a new Extents object. extentsVec size is now: %lu", extentsVec.size() );
+                notify(NFY_DEBUG, "Added a new Extents object. extentsVec size is now: %lu", extentsVec.size() );
             }
         }
         else {
@@ -79,9 +72,7 @@ public:
         }
     }
 
-    //std::map<khExtents < double>, QuadtreePath>
-    std::vector<khExtents<double>>
-    getData() { return extentsVec; }
+    std::vector<khExtents<double>> getData() { return extentsVec; }
 };
 
 class InsetTilespaceIndexTest : public testing::Test {
@@ -99,14 +90,14 @@ public:
         std::vector <khExtents<double>> matchingExtents;
         std::vector <khExtents<uint32>> tileExtentsVec;
         
-        notify(NFY_WARN, "Querying for extents that intersect with query Coverage Area:  \n\t%d, %d, %d, %d ... from level %d to %d",
+        notify(NFY_DEBUG, "Querying for extents that intersect with query Coverage Area:  \n\t%d, %d, %d, %d ... from level %d to %d",
                 queryExtents.beginX(), queryExtents.endX(), queryExtents.beginY(), queryExtents.endY(), 
                 beginLevel, endLevel );
 
         for (auto degExtents : testDegExtentsVec) {
             khExtents <uint32> tileExtents = DegExtentsToTileExtents(degExtents, 21);
             tileExtentsVec.push_back(tileExtents);
-            notify(NFY_WARN, "Converted test extents from decimal degrees \n\t%f, %f, %f, %f ... \nto tilespace: %d, %d, %d, %d \n\t",
+            notify(NFY_DEBUG, "Converted test extents from decimal degrees \n\t%f, %f, %f, %f ... \nto tilespace: %d, %d, %d, %d \n\t",
                     degExtents.beginX(), degExtents.endX(), degExtents.beginY(), degExtents.endY(),
                     tileExtents.beginX(), tileExtents.endX(), tileExtents.beginY(), tileExtents.endY());
         }
@@ -116,7 +107,7 @@ public:
                                 neededIndexes,
                                 0,
                                 0);
-        notify(NFY_WARN, "%lu", neededIndexes.size());
+        notify(NFY_INFO, "%lu", neededIndexes.size());
         for (uint index : neededIndexes) {
             khExtents<double> ex = testDegExtentsVec[index];
             matchingExtents.push_back(ex);
@@ -140,7 +131,7 @@ public:
                 queryMBR,
                 queryCoverageArea.beginLevel(),
                 queryCoverageArea.endLevel());
-        notify(NFY_WARN, "Got Here");
+        notify(NFY_INFO, "Got Here");
 
         return matchingExtentsVec;
     }
@@ -153,9 +144,9 @@ public:
         khInsetCoverage queryCoverageArea(RasterProductTilespaceFlat, queryExtentsArea, 19, 9, 21);
         std::vector<khExtents<double>> extentsTestDataVec = dataset.getData();
         std::vector<khExtents<double> > requiredExtentsProd = findInsetsControlAlgo(queryCoverageArea, extentsTestDataVec);
-        notify(NFY_WARN, "Old Algo Done, %lu insets overlap" , requiredExtentsProd.size());
+        notify(NFY_INFO, "Old Algo Done, %lu insets overlap" , requiredExtentsProd.size());
         std::vector<khExtents<double> > requiredExtentsExp = findInsetsExperimentalAlgo(queryCoverageArea, extentsTestDataVec);
-        notify(NFY_WARN, "New Algo Done, %lu insets overlap", requiredExtentsExp.size());
+        notify(NFY_INFO, "New Algo Done, %lu insets overlap", requiredExtentsExp.size());
         //std::sort(requiredExtentsProd.begin(), requiredExtentsExp.end()); 
         bool listsMatch = (requiredExtentsProd == requiredExtentsExp);
         return listsMatch;
