@@ -425,10 +425,15 @@ void FindNeededImageryInsets(
 
   for (uint i = 0; i < numInsets; ++i) {
     // Aligning here would be redundant, so we save ourselves the effort.
-    notify(NFY_WARN, "%d\t%d\t%d\t%d", genExtents.north(), genExtents.south(), genExtents.west(), genExtents.east());
     const khExtents<uint32> *iExtents = &extents[i];
+    notify(NFY_WARN, "Interection test: \n\tquerying:  \n\t\t%d, %d, %d, %d ... \n\tagainst: \n\t\t%d, %d, %d, %d \n",
+                    iExtents->beginX(), iExtents->endX(), iExtents->beginY(), iExtents->endY(),
+                    genExtents.beginX(), genExtents.endX(), genExtents.beginY(), genExtents.endY());
     if (iExtents->intersects(genExtents)) {
       neededIndexes.push_back(i);
+      notify(NFY_WARN, "\tIntesects = TRUE.  Intersection Count = %lu", neededIndexes.size());
+    } else {
+      notify(NFY_WARN, "\tIntesects = FALSE.");
     }
   }
 }

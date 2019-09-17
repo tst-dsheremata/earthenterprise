@@ -47,20 +47,18 @@
 class TestData {
     std::vector <khExtents<double>> extentsVec;
 
-public:/*
+public:
     TestData(std::string fname) {
         char path[354];
         getcwd(path,352) ;
         std::cout << "Current path is " << path << '\n';
         std::cout << "Reading date from file: " << fname;
-
-        std::ifstream input(fname);
-        notify(NFY_WARN, "Trying to open %s , pwd is %s",fname );
         std::ifstream input(fname);
         if (input) {
-            // First line and all even lines have 4 floats, for decimal degree representations of the input insets.
+            // First line and all even lines have 4 floats, for decimal degree 
+            // representations of the input insets.
             // Every odd line is a QtMBR.  Let's just read them in pairs.
-            for (std::string line; std::getline(input, line);)   //read stream line by line
+            for (std::string line; std::getline(input, line);)   
             {
                 std::istringstream in(line);
                 double x1, x2, y1, y2;
@@ -73,14 +71,13 @@ public:/*
                 in >> qtp_txt >> qtp_level;
                 // QuadtreePath qtpMbr(qtp_txt);
                 extentsVec.push_back(extents);
-                notify(NFY_WARN, "Added a new Extents object sizee is now %lu", extentsVec.size() );
+                notify(NFY_WARN, "Added a new Extents object. extentsVec size is now: %lu", extentsVec.size() );
             }
         }
         else {
             notify(NFY_WARN, "Not a file");
-
         }
-    }*/
+    }
 
     //std::map<khExtents < double>, QuadtreePath>
     std::vector<khExtents<double>>
@@ -157,8 +154,8 @@ public:
 
 
     const bool compareAlgorithmOutputs() {
-        //TestData dataset("/TestQTPs2.txt");
-        //std::vector<khExtents<double>> testExtents;
+        TestData dataset("./src/fusion/testdata/TestDataQTPs.txt");
+        std::vector<khExtents<double>> testExtents;
         /*
         std::vector <QuadtreePath> mbrHashVec;
         boost::copy(dataset.getData() | boost::adaptors::map_keys,
@@ -167,14 +164,17 @@ public:
         khExtents<double> insetExtents(XYOrder, 114.032, 114.167, 19.1851, 19.3137);
         khInsetCoverage coverage(RasterProductTilespace(false), insetExtents, 19, 7, 21);
         std::vector<khExtents<double>> test;
-        khExtents<double> testExtents(XYOrder, -123.531, -120.713, 36.4544, 38.4647);
-        khExtents<double> testExtents2(XYOrder, 114.032, 114.167, 19.1851, 19.3137);
-        test.push_back(testExtents);
-        test.push_back(testExtents2);
+        test = dataset.getData();
+        
+        // khExtents<double> testExtents(XYOrder, -123.531, -120.713, 36.4544, 38.4647);
+        // khExtents<double> testExtents2(XYOrder, 114.032, 114.167, 19.1851, 19.3137);
+        // test.push_back(testExtents);
+        // test.push_back(testExtents2);
         std::vector<khExtents<double> > requiredExtentsProd = findInsetsControlAlgo(coverage, test);
-        notify(NFY_WARN, "Old Algo Done, %lu", requiredExtentsProd.size());
+        notify(NFY_WARN, "Old Algo Done, %lu insets overlap" , requiredExtentsProd.size());
         std::vector<khExtents<double> > requiredExtentsExp = findInsetsExperimentalAlgo(coverage, test);
-        notify(NFY_WARN, "New Algo Done");
+        notify(NFY_WARN, "New Algo Done, %lu insets overlap", requiredExtentsExp.size());
+        //std::sort(requiredExtentsProd.begin(), requiredExtentsExp.end()); 
         bool listsMatch = (requiredExtentsProd == requiredExtentsExp);
         return listsMatch;
     }

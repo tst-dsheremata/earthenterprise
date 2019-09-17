@@ -41,14 +41,12 @@ QuadtreePath InsetTilespaceIndex::add(const khExtents <double> &extents) {
     int level;
     QuadtreePath quadtreeMbr = getQuadtreeMBR(extents, level, MAX_LEVEL);
 
-    //std::vector<const khExtents<uint32>*> mbrExtentsVec = _mbrExtentsVecMap.find( mbrHash );
     std::vector<khExtents <double> > *mbrExtentsVec;
     std::map<QuadtreePath, std::vector<khExtents <double>>>::iterator it;
     it = _mbrExtentsVecMap.find(quadtreeMbr);
 
     if (it == _mbrExtentsVecMap.end()) {
         mbrExtentsVec = new std::vector<khExtents <double> >();
-        // _mbrExtentsVecMap.insert(  <uint64, std::vector<const khExtents <uint32>*>>::value_type(  mbrHash, *mbrExtentsVec );
         _mbrExtentsVecMap.insert({quadtreeMbr, *mbrExtentsVec});
     } else {
         mbrExtentsVec = &(it->second);
@@ -118,16 +116,16 @@ QuadtreePath InsetTilespaceIndex::getQuadtreeMBR(const khExtents<double> &extent
 
 std::vector <QuadtreePath>
 InsetTilespaceIndex::intersectingExtentsQuadtreePaths(QuadtreePath quadtreeMbr, uint32 minLevel, uint32 maxLevel) {
-    //uint64 mbrHash = qtpath.internalPath();
-    //std::vector <QuadtreePath>  mbrHashVec = _mbrExtentsVecMap.getKeys();
     std::vector <QuadtreePath> mbrHashVec;
     boost::copy(_mbrExtentsVecMap | boost::adaptors::map_keys,
                 std::back_inserter(mbrHashVec));
     std::vector <QuadtreePath> intersectingQuadtrees;
 
-    // TODO - redo this section to use bitwise filtering and partitioning using the QuadtreePath's internal path_
-    // bits, as this will be most expeditions.  However, this requires  access to private constructors and data.
-    // BTree lookups in the mbrHashVec could also bring the time complexity to O(log n)
+    // TODO - redo this section to use bitwise filtering and partitioning 
+    // using the QuadtreePath's internal path_ bits, as this will be most 
+    // expeditious.  However, this requires  access to private constructors 
+    // and data. BTree lookups in the mbrHashVec could also bring the time 
+    // complexity to O(log n)
     for (uint32 level = minLevel; minLevel <= maxLevel; level++) {
         for (QuadtreePath &otherMbr : mbrHashVec) {
             if (otherMbr.Level() >= minLevel && otherMbr.Level() <= maxLevel) {
