@@ -99,8 +99,9 @@ public:
         std::vector <khExtents<double>> matchingExtents;
         std::vector <khExtents<uint32>> tileExtentsVec;
         
-        notify(NFY_WARN, "Querying for extents that intersect with query Coverage Area:  \n\t%d, %d, %d, %d ... ",
-                queryExtents.beginX(), queryExtents.endX(), queryExtents.beginY(), queryExtents.endY() );
+        notify(NFY_WARN, "Querying for extents that intersect with query Coverage Area:  \n\t%d, %d, %d, %d ... from level %d to %d",
+                queryExtents.beginX(), queryExtents.endX(), queryExtents.beginY(), queryExtents.endY(), 
+                beginLevel, endLevel );
 
         for (auto degExtents : testDegExtentsVec) {
             khExtents <uint32> tileExtents = DegExtentsToTileExtents(degExtents, 21);
@@ -113,8 +114,8 @@ public:
                                 tileExtentsVec,
                                 tileExtentsVec.size(),
                                 neededIndexes,
-                                beginLevel,
-                                endLevel);
+                                0,
+                                0);
         notify(NFY_WARN, "%lu", neededIndexes.size());
         for (uint index : neededIndexes) {
             khExtents<double> ex = testDegExtentsVec[index];

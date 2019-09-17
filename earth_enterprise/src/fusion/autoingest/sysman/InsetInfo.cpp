@@ -426,7 +426,7 @@ void FindNeededImageryInsets(
   for (uint i = 0; i < numInsets; ++i) {
     // Aligning here would be redundant, so we save ourselves the effort.
     const khExtents<uint32> *iExtents = &extents[i];
-    notify(NFY_WARN, "Interection test: \n\tquerying:  \n\t\t%d, %d, %d, %d ... \n\tagainst: \n\t\t%d, %d, %d, %d \n",
+    notify(NFY_WARN, "Interection test: \n\tquerying:  \n\t\t%d, %d, %d, %d ... \n\tagainst covereage area: \n\t\t%d, %d, %d, %d \n",
                     iExtents->beginX(), iExtents->endX(), iExtents->beginY(), iExtents->endY(),
                     genExtents.beginX(), genExtents.endX(), genExtents.beginY(), genExtents.endY());
     if (iExtents->intersects(genExtents)) {
