@@ -146,7 +146,7 @@ public:
     }
 
 
-    const bool compareAlgorithmOutput(std::string fname) {
+    const bool compareAlgorithmOutputs(std::string fname) {
         TestData dataset(fname);
         //std::vector<khExtents<double>> testExtents;
         khExtents<double> queryExtentsArea(XYOrder, 114.032, 114.167, 19.1851, 19.3137);
@@ -181,15 +181,15 @@ TEST_F(InsetTilespaceIndexTest, DecendToMaxLevel) {
 }
 
 TEST_F(InsetTilespaceIndexTest, compareAlgorithmOutputTinyDataset) {
-    EXPECT_EQ(compareAlgorithmOutputs("./src/fusion/testdata/TinyTestDataQTPs.txt", true);
+    EXPECT_EQ(compareAlgorithmOutputs("./src/fusion/testdata/TinyTestDataQTPs.txt"), true);
 }
 
 TEST_F(InsetTilespaceIndexTest, compareAlgorithmOutputSmallDataset) {
-    EXPECT_EQ(compareAlgorithmOutputs("./src/fusion/testdata/SmallTestDataQTPs.txt", true);
+    EXPECT_EQ(compareAlgorithmOutputs("./src/fusion/testdata/SmallTestDataQTPs.txt"), true);
 }
 
 TEST_F(InsetTilespaceIndexTest, compareAlgorithmOutputLargeDataset) {
-    EXPECT_EQ(compareAlgorithmOutputs("./src/fusion/testdata/LargeTestDataQTPs.txt", true);
+    EXPECT_EQ(compareAlgorithmOutputs("./src/fusion/testdata/LargeTestDataQTPs.txt"), true);
 }
 
 //This test should result in the quadtree path 202 being returned.
