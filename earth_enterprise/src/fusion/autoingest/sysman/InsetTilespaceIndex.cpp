@@ -117,8 +117,10 @@ QuadtreePath InsetTilespaceIndex::getQuadtreeMBR(const khExtents<double> &extent
 std::vector <QuadtreePath>
 InsetTilespaceIndex::intersectingExtentsQuadtreePaths(QuadtreePath quadtreeMbr, uint32 minLevel, uint32 maxLevel) {
     std::vector <QuadtreePath> mbrHashVec;
+    notify(NFY_WARN, "intersectingExtentsQuadtreePaths... index has quadtree count of: %lu", _mbrExtentsVecMap.size());
     boost::copy(_mbrExtentsVecMap | boost::adaptors::map_keys,
                 std::back_inserter(mbrHashVec));
+    notify(NFY_WARN, "intersectingExtentsQuadtreePaths... mbrHashVec size is: %lu ", mbrHashVec.size() );                
     std::vector <QuadtreePath> intersectingQuadtrees;
 
     // TODO - redo this section to use bitwise filtering and partitioning 
@@ -126,13 +128,22 @@ InsetTilespaceIndex::intersectingExtentsQuadtreePaths(QuadtreePath quadtreeMbr, 
     // expeditious.  However, this requires  access to private constructors 
     // and data. BTree lookups in the mbrHashVec could also bring the time 
     // complexity to O(log n)
-    for (uint32 level = minLevel; minLevel <= maxLevel; level++) {
+    notify(NFY_WARN, "intersectingExtentsQuadtreePaths... checking levels %d to %d ", minLevel, maxLevel );
+    for (uint32 level = minLevel; level <= maxLevel; level++) {
         for (QuadtreePath &otherMbr : mbrHashVec) {
+            notify(NFY_WARN, "Comparing extents from \n\tquery Quadtree:  %s with \n\tOTHER extents Quadtree:  %s",
+                quadtreeMbr.AsString().c_str(), otherMbr.AsString().c_str() );
             if (otherMbr.Level() >= minLevel && otherMbr.Level() <= maxLevel) {
                 if (QuadtreePath::OverlapsAtLevel(quadtreeMbr, otherMbr, level)) {
                     intersectingQuadtrees.push_back(otherMbr);
+                    notify(NFY_WARN, "\tOVERLAP at level %d", level );
                     break;
+                } else {
+                    notify(NFY_WARN, "\tno overlap at level %d", level );
                 }
+            }
+            else { 
+                notify(NFY_WARN, "\tno overlap - OTHER MBR is out of level bounds (%d not in %d->%d)", level, minLevel, maxLevel );
             }
         }
     }
