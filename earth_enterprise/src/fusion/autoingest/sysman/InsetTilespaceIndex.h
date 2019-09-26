@@ -27,6 +27,7 @@ Description: Support for terrain "overlay" projects.
 
 #include <string>
 #include <functional>
+#include <unordered_set>
 #include "common/khTileAddr.h"
 #include "common/quadtreepath.h"
 #include "common/khExtents.h"
@@ -47,7 +48,7 @@ const int MAX_LEVEL = 24;
 class InsetTilespaceIndex {
 
 protected:
-    std::map <QuadtreePath, std::vector<khExtents <double> >> _mbrExtentsVecMap;
+    std::map <QuadtreePath, std::unordered_set<khExtents <double> >> _mbrExtentsSetMap;
 public:
     InsetTilespaceIndex() = default;
 

@@ -31,6 +31,7 @@ Changes:
 #include <boost/range/irange.hpp>
 #include <boost/range/any_range.hpp>
 #include <map>
+#include <unordered_set>
 #include <vector>
 #include <iostream>
 #include <stdint.h>
@@ -42,16 +43,16 @@ QuadtreePath InsetTilespaceIndex::add(const khExtents <double> &extents) {
     QuadtreePath quadtreeMbr = getQuadtreeMBR(extents, level, MAX_LEVEL);
 
     std::vector<khExtents <double> > *mbrExtentsVec;
-    std::map<QuadtreePath, std::vector<khExtents <double>>>::iterator quadTreeMbrExtentsVecPair;
-    quadTreeMbrExtentsVecPair = _mbrExtentsVecMap.find(quadtreeMbr);
+    std::map<QuadtreePath, std::unordered_set<khExtents <double>>>::iterator quadTreeMbrExtentsVecPair;
+    quadTreeMbrExtentsVecPair = _mbrExtentsSetMap.find(quadtreeMbr);
 
-    if (quadTreeMbrExtentsVecPair == _mbrExtentsVecMap.end()) {
-        mbrExtentsVec = new std::vector<khExtents <double> >();
-        _mbrExtentsVecMap.insert({quadtreeMbr, *mbrExtentsVec});
+    if (quadTreeMbrExtentsVecPair == _mbrExtentsSetMap.end()) {
+        mbrExtentsVec = new std::unordered_set<khExtents <double> >();
+        _mbrExtentsSetMap.insert({quadtreeMbr, *mbrExtentsVec});
     } else {
         mbrExtentsVec = &(quadTreeMbrExtentsVecPair->second);
     }
-    mbrExtentsVec->push_back(extents);
+    mbrExtentsVec->insert(extents);
     return quadtreeMbr;
 }
 
@@ -117,8 +118,8 @@ QuadtreePath InsetTilespaceIndex::getQuadtreeMBR(const khExtents<double> &extent
 std::vector <QuadtreePath>
 InsetTilespaceIndex::intersectingExtentsQuadtreePaths(QuadtreePath quadtreeMbr, uint32 minLevel, uint32 maxLevel) {
     std::vector <QuadtreePath> mbrHashVec;
-    notify(NFY_DEBUG, "intersectingExtentsQuadtreePaths: index has quadtree count of: %lu", _mbrExtentsVecMap.size());
-    boost::copy(_mbrExtentsVecMap | boost::adaptors::map_keys,
+    notify(NFY_DEBUG, "intersectingExtentsQuadtreePaths: index has quadtree count of: %lu", _mbrExtentsSetMap.size());
+    boost::copy(_mbrExtentsSetMap | boost::adaptors::map_keys,
                 std::back_inserter(mbrHashVec));
     notify(NFY_DEBUG, "intersectingExtentsQuadtreePaths: mbrHashVec size is: %lu ", mbrHashVec.size() );                
     std::vector <QuadtreePath> intersectingQuadtrees;
@@ -167,7 +168,7 @@ InsetTilespaceIndex::intersectingExtents(const QuadtreePath quadtreeMbr, uint32 
         intersectingQuadtreeMbrs.size(), quadtreeMbr.AsString().c_str() );
     std::vector<khExtents <double> > intersectingExtentsVec;
     for (auto otherMbr : intersectingQuadtreeMbrs) {
-        std::vector<khExtents <double> > extentsVec = _mbrExtentsVecMap[otherMbr];
+        std::vector<khExtents <double> > extentsVec = _mbrExtentsSetMap[otherMbr];
         notify(NFY_DEBUG, "\tintersectingExtents: Adding %lu intersecting extents from\n\t QUERY Quadtree:  %s OVERLAPs with  \n\tMATCHING extents Quadtree:  %s",
             extentsVec.size(), quadtreeMbr.AsString().c_str(), otherMbr.AsString().c_str() );
         intersectingExtentsVec.insert(intersectingExtentsVec.end(), extentsVec.begin(), extentsVec.end());

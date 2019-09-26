@@ -95,6 +95,19 @@ class khExtents {
     }
   }
 
+  
+  struct Hash {
+   size_t operator() (const khExtents<t> &extents) const {
+       std::size_t h1 = std::hash<t>{}(extents.beginX_) ;
+       std::size_t h1 = std::hash<t>{}(extents.endX_) ;
+       std::size_t h1 = std::hash<t>{}(extents.beginY_) ;
+       std::size_t h1 = std::hash<t>{}(extents.endY_) ;
+       return h1 ^ (h2 << 1) ^ (h3 << 2) ^ (h3 << 2); 
+     
+     
+   }
+};
+
   bool operator==(const khExtents &o) const {
     return (beginX_ == o.beginX_ &&
             endX_ == o.endX_ &&

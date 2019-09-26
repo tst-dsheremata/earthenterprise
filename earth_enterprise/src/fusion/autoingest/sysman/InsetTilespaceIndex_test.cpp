@@ -124,8 +124,8 @@ public:
         for (auto extents : testDegExtentsVec) {
             qtIndex.add(extents);
         }
-        int level = queryCoverageArea.beginLevel();
-        auto queryMBR = qtIndex.getQuadtreeMBR(queryCoverageArea.degreeExtents(), level, queryCoverageArea.endLevel());
+        
+        auto queryMBR = qtIndex.getQuadtreeMBR(queryCoverageArea.degreeExtents(), queryCoverageArea.beginLevel();, queryCoverageArea.endLevel());
 
         matchingExtentsVec = qtIndex.intersectingExtents(
                 queryMBR,
