@@ -26,6 +26,9 @@ class PostgresProperties(object):
     self.port_number = utils.GetPostgresPortNumber()
     if not self.port_number:
       self.port_number = "5432"
+  self.host = utils.GetPostgresHost()
+    if not self.host:
+      self.host = "/tmp"
 
   def GetPortNumber(self):
     """Get the port number for the Postgres database.
@@ -34,3 +37,11 @@ class PostgresProperties(object):
       the port number string.
     """
     return self.port_number
+
+  def GetHost(self):
+    """Get the host for the Postgres database.
+
+    Returns:
+      the host number string.
+    """
+    return self.host
